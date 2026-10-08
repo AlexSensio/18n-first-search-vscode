@@ -1,0 +1,137 @@
+{
+  "name": "i18n-first-search",
+  "displayName": "i18n First Search",
+  "description": "Mantém a busca nativa (Ctrl+F e Ctrl+Shift+F). Ao apertar Enter, se o texto digitado for uma tradução (i18n), troca a busca pelas chaves correspondentes.",
+  "version": "0.3.2",
+  "publisher": "local-dev",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Search"
+  ],
+  "keywords": [
+    "i18n",
+    "translate",
+    "ngx-translate",
+    "search",
+    "locale"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [],
+  "scripts": {
+    "test": "node --test test/",
+    "package": "npx --yes @vscode/vsce package --allow-missing-repository --skip-license",
+    "reinstall": "(code --list-extensions | grep -qx local-dev.i18n-first-search && code --uninstall-extension local-dev.i18n-first-search || true) && npm run package && code --install-extension i18n-first-search-$npm_package_version.vsix --force"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "i18nSearch.enterInFind",
+        "title": "i18n: (interno) Enter na busca do editor"
+      },
+      {
+        "command": "i18nSearch.enterInSearch",
+        "title": "i18n: (interno) Enter na pesquisa global"
+      },
+      {
+        "command": "i18nSearch.reindex",
+        "title": "i18n: Reindexar arquivos de tradução"
+      },
+      {
+        "command": "i18nSearch.toggleEnabled",
+        "title": "i18n: Ligar/desligar tradução de buscas"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "i18nSearch.enterInFind",
+        "key": "enter",
+        "when": "findInputFocussed && config.i18nSearch.enabled"
+      },
+      {
+        "command": "i18nSearch.enterInSearch",
+        "key": "enter",
+        "when": "searchInputBoxFocus && !inSearchEditor && config.i18nSearch.enabled"
+      }
+    ],
+    "configuration": {
+      "title": "i18n First Search",
+      "properties": {
+        "i18nSearch.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Quando ligado, o Enter nas caixas de busca nativas (Ctrl+F e Ctrl+Shift+F) troca textos traduzidos pelas chaves i18n correspondentes."
+        },
+        "i18nSearch.localeFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/{locale,locales,i18n,lang,langs,translations}/**/*.{json,yaml,yml}",
+            "**/*{pt-BR,pt-br,pt_BR,pt_br}*.{json,js,ts}"
+          ],
+          "description": "Globs dos arquivos de tradução (JSON, YAML, ou JS/TS com `export default {…}` / `module.exports = {…}`)."
+        },
+        "i18nSearch.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/.git/**",
+            "**/dist/**",
+            "**/coverage/**",
+            "**/.angular/**",
+            "**/out/**"
+          ],
+          "description": "Globs ignorados ao procurar arquivos de tradução."
+        },
+        "i18nSearch.matchMode": {
+          "type": "string",
+          "enum": [
+            "strict",
+            "loose"
+          ],
+          "default": "strict",
+          "enumDescriptions": [
+            "A chave não pode ser parte de outra (`SAVE` não casa dentro de `BUTTONS.SAVE` nem de `SAVE_ALL`).",
+            "Casa a chave em qualquer lugar do texto."
+          ],
+          "description": "Como as chaves são casadas no código."
+        },
+        "i18nSearch.maxKeys": {
+          "type": "number",
+          "default": 300,
+          "minimum": 1,
+          "description": "Máximo de chaves colocadas no regex quando o texto casa com muitas traduções."
+        },
+        "i18nSearch.excludeLocaleFilesFromGlobalSearch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Na busca global, exclui os próprios arquivos de tradução dos resultados."
+        },
+        "i18nSearch.minQueryLength": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "description": "Tamanho mínimo do texto digitado para procurar nas traduções."
+        },
+        "i18nSearch.includeLiteralTextInProject": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ctrl+Shift+F: além das chaves, também procura o texto digitado (sem diferenciar maiúsculas), para achar usos em outros tipos de arquivo."
+        },
+        "i18nSearch.includeLiteralTextInFile": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ctrl+F: além das chaves, também procura o texto digitado (sem diferenciar maiúsculas)."
+        }
+      }
+    }
+  }
+}
